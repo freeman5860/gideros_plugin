@@ -1,4 +1,4 @@
-package com.gideros.android.plugins;
+package com.gideros.android.plugins.samsung;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,11 +22,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.gideros.android.plugins.samsung.ErrorVO;
-import com.gideros.android.plugins.samsung.PurchaseVO;
-import com.gideros.android.plugins.samsung.SamsungIapHelper;
 import com.gideros.android.plugins.samsung.SamsungIapHelper.OnIapBindListener;
-import com.gideros.android.plugins.samsung.VerificationVO;
+
 
 public class SamsungIAP {
 	private static final String TAG = SamsungIAP.class.getSimpleName();
