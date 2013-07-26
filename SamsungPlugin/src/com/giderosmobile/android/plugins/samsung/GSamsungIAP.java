@@ -25,8 +25,8 @@ import android.widget.Toast;
 import com.giderosmobile.android.plugins.samsung.SamsungIapHelper.OnIapBindListener;
 
 
-public class SamsungIAP {
-	private static final String TAG = SamsungIAP.class.getSimpleName();
+public class GSamsungIAP {
+	private static final String TAG = GSamsungIAP.class.getSimpleName();
 
 	/** result of IAPService initialization */
 	private static ErrorVO mErrorVO = null;
@@ -61,9 +61,27 @@ public class SamsungIAP {
 	// ========================================================================
 
 	private static WeakReference<Activity> sActivity;
+	private static GSamsungIAP sInstance;
+	private static long sData;
 
 	public static void onCreate(Activity activity) {
 		sActivity = new WeakReference<Activity>(activity);
+	}
+	
+	static public void init(long data){
+		sData = data;
+		sInstance = new GSamsungIAP(sActivity.get());
+	}
+	
+	static public void cleanup(){
+		if(sInstance != null){
+			sData = 0;
+			sInstance = null;
+		}
+	}
+	
+	public GSamsungIAP(Activity activity){
+		
 	}
 	
 	public static void onDestroy(){
@@ -83,6 +101,8 @@ public class SamsungIAP {
 				mVerifyClientToServer.cancel(true);
 			}
 		}
+		
+		cleanup();
 	}
 
 	public static void onActivityResult(int requestCode, int resultCode,
@@ -174,7 +194,7 @@ public class SamsungIAP {
 		}
 	}
 
-	public static void purchaseItem(final String itemGroupId, final String itemId) {
+	public static boolean purchaseItem(final String itemGroupId, final String itemId) {
 		sActivity.get().runOnUiThread(new Runnable() {
 			
 			@Override
@@ -182,7 +202,10 @@ public class SamsungIAP {
 				uiPurchaseItem(itemGroupId, itemId);
 			}
 		});
+		return true;
 	}
+	
+	private static native void onPurchaseStateChange(int purchaseState, String itemGroupId, String itemId, long data);
 	
 	private static void uiPurchaseItem(String itemGroupId, String itemId){
 		// 1.store Item Group Id and Item Id
@@ -221,7 +244,7 @@ public class SamsungIAP {
 	 */
 	public static void bindIapService() {
 		// 1.Test Success Mode:1,COMMERCIAL MODE:0,Test Fail Mode:-1
-		mSamsungIapHelper.setMode(1);
+		mSamsungIapHelper.setMode(0);
 
 		// 2.bind to IAPService
 		mSamsungIapHelper.bindIapService(new OnIapBindListener() {
@@ -444,11 +467,15 @@ public class SamsungIAP {
 						"Payment success", 
 						"paymentID:	" + mPurchaseVO.getPaymentId(), 
 						false, null);
+				if (sData != 0)
+	        		GSamsungIAP.onPurchaseStateChange(0, mPurchaseVO.getPaymentId(), mPurchaseVO.getItemId(), sData);
 			}else{
 				mSamsungIapHelper.showIapDialog(sActivity.get(), 
 						"Payment error", 
 						"paymentID:	" + mPurchaseVO.getPaymentId(), 
 						false, null);
+				if (sData != 0)
+	        		GSamsungIAP.onPurchaseStateChange(1, mPurchaseVO.getPaymentId(), mPurchaseVO.getItemId(), sData);
 			}
 		}
 		
