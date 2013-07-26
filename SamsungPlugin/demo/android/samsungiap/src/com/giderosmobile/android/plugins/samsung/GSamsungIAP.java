@@ -244,7 +244,7 @@ public class GSamsungIAP {
 	 */
 	public static void bindIapService() {
 		// 1.Test Success Mode:1,COMMERCIAL MODE:0,Test Fail Mode:-1
-		mSamsungIapHelper.setMode(0);
+		mSamsungIapHelper.setMode(1);
 
 		// 2.bind to IAPService
 		mSamsungIapHelper.bindIapService(new OnIapBindListener() {
